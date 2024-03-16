@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "GES8bIYOU7/bWjFbFAgg84OfI1J4bMKGg3nMXYDmMT0=",
+  "Source": "LinkedinScraping",
+  "BasePath": "_content/LinkedinScraping",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}
