@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("LinkedinScraping")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+7a1c73d9c92ea28ee821539dbfb42e1630bbbca1")]
 [assembly: System.Reflection.AssemblyProductAttribute("LinkedinScraping")]
 [assembly: System.Reflection.AssemblyTitleAttribute("LinkedinScraping")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

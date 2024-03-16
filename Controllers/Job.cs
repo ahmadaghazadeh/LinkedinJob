@@ -25,6 +25,8 @@ public class Job
 
 	public bool IsRelocation { get; set; }
 
+	public bool IsRemote { get; set; }
+
 	public string JobDescriptiob { get; set; }
 
 
