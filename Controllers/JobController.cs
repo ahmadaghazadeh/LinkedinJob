@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Azure.Core;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using System.Text.Json;
 
@@ -14,7 +15,7 @@ namespace LinkedinScraping.Controllers
 		private JobContext _dbContext;
 		List<string> Fields=new List<string>();
 		List<string> geoids = new List<string>();
-		int pageFetch =1;
+		int pageFetch =2;
 
 		public JobController(IConfiguration configuration, JobContext dbContext, IHttpClientFactory httpClientFactory)
 		{
@@ -37,7 +38,7 @@ namespace LinkedinScraping.Controllers
 			{
 				Parallel.ForEach(Fields, field =>
 				{
-					Parallel.For(0, pageFetch, async page =>
+					Parallel.For(1, pageFetch, async page =>
 					{
 						var tempJobs = await TempJobs(field, geoid, page);
 						jobs.AddRange(tempJobs);
@@ -70,7 +71,9 @@ namespace LinkedinScraping.Controllers
 		private async Task<Job> getJobDescriptionTask(Job job)
 		{
 			var httpClient = _httpClientFactory.CreateClient();
-			var response = await httpClient.GetAsync($"{job.JobLink}");
+			var request = new HttpRequestMessage(HttpMethod.Get, job.JobLink);
+			request.Headers.Add("Cookie", "bcookie=\"v=2&5189c6ca-992c-4ec6-8693-eaa083a369b3\"; lang=v=2&lang=en-us; li_gc=MTswOzE3MTA1Nzk2MzI7MjswMjEIt+qNlqOr1l4nDib3XM5DNgMWyhInR8l5mk4KWqwEdQ==; lidc=\"b=VGST07:s=V:r=V:a=V:p=V:g=2888:u=1:x=1:i=1710594731:t=1710681131:v=2:sig=AQH83d0dCgjmKiCzDYjNS-eMDXv6Z1NF\"; JSESSIONID=ajax:4908604551682048916; bscookie=\"v=1&20240316131210de789e08-5611-4431-8623-63f2416c8255AQH9C284r0ekK0Ndc0GM2r5HkKy1w3LE\"");
+			var response = await httpClient.SendAsync(request);
 			if (response.IsSuccessStatusCode)
 			{
 				var content = await response.Content.ReadAsStreamAsync();
