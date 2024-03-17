@@ -1,4 +1,5 @@
 using LinkedinScraping;
+using LinkedinScraping.Controllers;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,6 +14,7 @@ builder.Services.AddDbContext<JobContext>(options =>
 	options
 		.UseSqlServer(connectionString);
 });
+
 
 builder.Services.AddHttpClient();
 builder.Services.AddControllers();

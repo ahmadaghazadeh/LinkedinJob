@@ -1,6 +1,4 @@
-﻿using Azure.Core;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.AspNetCore.Mvc; 
 using System.Text.Json;
 
 namespace LinkedinScraping.Controllers
@@ -11,20 +9,22 @@ namespace LinkedinScraping.Controllers
 	{
 		private readonly IHttpClientFactory _httpClientFactory;
 
-		private string path = "https://api.scrapingdog.com/linkedinjobs/?api_key=65f5604effbbac3174b4d31b";
-		private JobContext _dbContext;
+		private string path = "https://api.scrapingdog.com/linkedinjobs/?api_key=65f69b4159b3923d7ddeded1";
+		private string jobPath = "https://api.scrapingdog.com/linkedinjobs?api_key=65f69b4159b3923d7ddeded1";
 		List<string> Fields=new List<string>();
 		List<string> geoids = new List<string>();
 		int pageFetch =2;
+		private readonly  JobContext context;
 
-		public JobController(IConfiguration configuration, JobContext dbContext, IHttpClientFactory httpClientFactory)
+		public JobController(IConfiguration configuration,
+			IHttpClientFactory httpClientFactory,
+			JobContext context)
 		{
-			_dbContext = dbContext;
-
 			Fields = configuration.GetSection("Fileds").Get<List<string>>();
 			geoids = configuration.GetSection("geoids").Get<List<string>>();
 			pageFetch = configuration.GetSection("pageFetch").Get<int>();
 			_httpClientFactory = httpClientFactory;
+			this.context = context;
 		}
 
 		[HttpGet]
@@ -34,19 +34,30 @@ namespace LinkedinScraping.Controllers
 
 			var jobs=new List<Job>();
 
-			Parallel.ForEach(geoids, geoid =>
+			foreach (var geoid in geoids)
 			{
-				Parallel.ForEach(Fields, field =>
+				foreach (var field in Fields)
 				{
-					Parallel.For(1, pageFetch, async page =>
+					for (int page = 1; page < pageFetch; page++)
 					{
-						var tempJobs = await TempJobs(field, geoid, page);
-						jobs.AddRange(tempJobs);
-					});
-				});
-
-			});
- 
+						try
+						{
+							var tempJobs = await TempJobs(field, geoid, page);
+							if (tempJobs.Any())
+							{
+								jobs.AddRange(tempJobs);
+								context.Jobs.AddOrUpdateRange(tempJobs);
+								await context.SaveChangesAsync();
+							}
+						}
+						catch (Exception e)
+						{
+							Console.WriteLine(e);
+							throw;
+						}
+					}
+				}
+			}
 			return jobs;
 		}
 
@@ -61,8 +72,17 @@ namespace LinkedinScraping.Controllers
 				var tempJobs = await JsonSerializer.DeserializeAsync<List<Job>>(content);
 				foreach (var job in tempJobs)
 				{
-					var jobNew =await getJobDescriptionTask(job);
-					jobs.Add(jobNew);
+					try
+					{
+						var jobNew = await getJobDescriptionTask(job);
+						jobs.Add(jobNew);
+					}
+					catch (Exception e)
+					{
+						Console.WriteLine(e);
+						throw;
+					}
+					
 				}
 			}
 			return jobs;
@@ -71,21 +91,21 @@ namespace LinkedinScraping.Controllers
 		private async Task<Job> getJobDescriptionTask(Job job)
 		{
 			var httpClient = _httpClientFactory.CreateClient();
-			var request = new HttpRequestMessage(HttpMethod.Get, job.JobLink);
-			request.Headers.Add("Cookie", "bcookie=\"v=2&5189c6ca-992c-4ec6-8693-eaa083a369b3\"; lang=v=2&lang=en-us; li_gc=MTswOzE3MTA1Nzk2MzI7MjswMjEIt+qNlqOr1l4nDib3XM5DNgMWyhInR8l5mk4KWqwEdQ==; lidc=\"b=VGST07:s=V:r=V:a=V:p=V:g=2888:u=1:x=1:i=1710594731:t=1710681131:v=2:sig=AQH83d0dCgjmKiCzDYjNS-eMDXv6Z1NF\"; JSESSIONID=ajax:4908604551682048916; bscookie=\"v=1&20240316131210de789e08-5611-4431-8623-63f2416c8255AQH9C284r0ekK0Ndc0GM2r5HkKy1w3LE\"");
-			var response = await httpClient.SendAsync(request);
+			var response = await httpClient.GetAsync($"{jobPath}&job_id={job.JobId}");
 			if (response.IsSuccessStatusCode)
 			{
 				var content = await response.Content.ReadAsStreamAsync();
-				var jobDesc = await JsonSerializer.DeserializeAsync<string>(content);
-				if (jobDesc.Contains("relocat"))
+				var jobInfo = await JsonSerializer.DeserializeAsync<List<JobInfo>>(content);
+				if (jobInfo[0].JobDescription.Contains("relocat"))
 				{
 					job.IsRelocation = true;
 				}
-				if (jobDesc.Contains("remote"))
+				if (jobInfo[0].JobDescription.Contains("remote"))
 				{
 					job.IsRemote = true;
 				}
+
+				job.JobDescriptiob = jobInfo[0].JobDescription;
 			}
 			
 			return job;

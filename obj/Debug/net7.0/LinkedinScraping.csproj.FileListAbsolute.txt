@@ -73,3 +73,8 @@ D:\Aghazadeh\Git\LinkedinScraping\LinkedinScraping\bin\Debug\net7.0\runtimes\win
 D:\Aghazadeh\Git\LinkedinScraping\LinkedinScraping\bin\Debug\net7.0\runtimes\win\lib\net6.0\System.Security.Cryptography.ProtectedData.dll
 D:\Aghazadeh\Git\LinkedinScraping\LinkedinScraping\bin\Debug\net7.0\runtimes\win\lib\net6.0\System.Windows.Extensions.dll
 D:\Aghazadeh\Git\LinkedinScraping\LinkedinScraping\obj\Debug\net7.0\LinkedinScraping.sourcelink.json
+D:\Aghazadeh\Git\LinkedinScraping\LinkedinScraping\bin\Debug\net7.0\Humanizer.dll
+D:\Aghazadeh\Git\LinkedinScraping\LinkedinScraping\bin\Debug\net7.0\Microsoft.EntityFrameworkCore.Design.dll
+D:\Aghazadeh\Git\LinkedinScraping\LinkedinScraping\bin\Debug\net7.0\Microsoft.Extensions.DependencyModel.dll
+D:\Aghazadeh\Git\LinkedinScraping\LinkedinScraping\bin\Debug\net7.0\Mono.TextTemplating.dll
+D:\Aghazadeh\Git\LinkedinScraping\LinkedinScraping\bin\Debug\net7.0\System.CodeDom.dll
